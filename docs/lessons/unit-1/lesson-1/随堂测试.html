@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>认识智慧农业 · 随堂测试</title>
+  <style>
+    :root {
+      --paper: #f3ead6;
+      --sheet: #fffaf0;
+      --rule: #d8cbb0;
+      --ink: #1f1a14;
+      --ink-soft: #5c5348;
+      --olive: #3d5346;
+      --olive-deep: #2a3b32;
+      --ok: #067833;
+      --ok-bg: #7ed99a;
+      --ok-ink: #03481f;
+      --bad: #c9857f;
+      --bad-bg: #fbe9e7;
+      --bad-ink: #874b47;
+      --mark: #c45c2a;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 50% 0%, #f7efdc, var(--paper) 55%);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    .wrap {
+      width: min(680px, calc(100% - 28px));
+      margin: 28px auto 64px;
+    }
+
+    .sheet {
+      background: var(--sheet);
+      border: 1px solid #cfc1a4;
+      box-shadow: 0 1px 0 #fff8ea inset, 0 14px 36px rgba(70, 52, 24, .08);
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      padding: 22px 28px 16px;
+      border-bottom: 3px double var(--olive-deep);
+    }
+    .kicker {
+      margin: 0;
+      color: var(--olive);
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    h1 {
+      margin: 4px 0 0;
+      font-family: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+    .stamp {
+      align-self: start;
+      padding: 6px 9px 5px;
+      color: var(--mark);
+      font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+      font-size: 15px;
+      border: 1.5px solid var(--mark);
+      transform: rotate(8deg);
+      opacity: .85;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 28px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      border-bottom: 1px solid var(--rule);
+      background: #f7f0de;
+    }
+    .track {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border: 1px solid var(--olive);
+      background: transparent;
+    }
+    .dot.done { background: var(--olive); }
+    .dot.now { background: #e8c36a; border-color: #b0892a; }
+
+    .stage { padding: 26px 28px 28px; min-height: 420px; }
+
+    .q-label {
+      margin: 0 0 8px;
+      color: var(--olive);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .stem {
+      margin: 0 0 20px;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .choices { display: grid; gap: 8px; }
+    .choice {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 11px 12px;
+      color: inherit;
+      text-align: left;
+      font: inherit;
+      background: #fff;
+      border: 1px solid #d7ccb6;
+      cursor: pointer;
+    }
+    .choice:hover:not(:disabled) { border-color: var(--olive); background: #fbf7ec; }
+    .choice:focus-visible { outline: 2px solid var(--olive); outline-offset: 2px; }
+    .choice:disabled { cursor: default; }
+    .choice.is-right,
+    .choice.is-key {
+      color: var(--ok-ink);
+      border-color: var(--ok);
+      background: var(--ok-bg);
+    }
+    .choice.is-wrong,
+    .choice.is-miss {
+      color: var(--bad-ink);
+      border-color: var(--bad);
+      background: var(--bad-bg);
+    }
+    .mark {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--olive-deep);
+      background: #fff;
+      border: 1px solid currentColor;
+    }
+    .choice.is-right .mark,
+    .choice.is-key .mark {
+      color: #fff;
+      background: var(--ok);
+      border-color: var(--ok);
+    }
+    .choice.is-wrong .mark,
+    .choice.is-miss .mark {
+      color: #fff;
+      background: var(--bad);
+      border-color: var(--bad);
+    }
+    .tag {
+      padding: 1px 7px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag.ok { color: #fff; background: var(--ok); }
+    .tag.bad { color: #fff; background: var(--bad); }
+    .choice .why {
+      grid-column: 1 / -1;
+      display: none;
+      margin-top: 6px;
+      padding: 8px 10px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      background: rgba(255,255,255,.55);
+    }
+    .choice.open .why { display: block; }
+    .why b { display: block; margin-bottom: 2px; font-size: 12px; }
+    .hint-tap {
+      grid-column: 2 / -1;
+      display: none;
+      margin-top: 2px;
+      font-size: 12px;
+      opacity: .75;
+    }
+    .revealed .choice:not(.open) .hint-tap { display: block; }
+
+    .banner {
+      display: none;
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--ok);
+      background: var(--ok-bg);
+      color: var(--ok-ink);
+    }
+    .banner.show { display: block; }
+    .banner.bad {
+      border-left-color: var(--bad);
+      background: var(--bad-bg);
+      color: var(--bad-ink);
+    }
+    .banner strong { display: block; margin-bottom: 4px; font-size: 16px; }
+    .banner p { margin: 0; font-size: 14px; }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .btn {
+      padding: 8px 16px;
+      color: var(--sheet);
+      font: inherit;
+      font-weight: 600;
+      background: var(--olive-deep);
+      border: 1px solid var(--olive-deep);
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--olive); }
+    .btn:disabled { opacity: .38; cursor: not-allowed; }
+    .btn.ghost {
+      color: var(--olive-deep);
+      background: transparent;
+    }
+    .btn.ghost:hover { background: #efe6d0; }
+
+    .scorecard { display: none; text-align: center; padding-top: 18px; }
+    .scorecard.show { display: block; }
+    .scorecard h2 {
+      margin: 0;
+      font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+      font-size: 22px;
+    }
+    .big {
+      margin: 10px 0 6px;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 56px;
+      line-height: 1;
+      letter-spacing: .04em;
+    }
+    .review {
+      margin-top: 22px;
+      text-align: left;
+      border-top: 1px solid var(--rule);
+    }
+    .review button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      background: none;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+    }
+    .review button span:last-child { color: var(--ink-soft); font-size: 13px; }
+
+    .foot {
+      padding: 10px 28px 16px;
+      color: #8a8070;
+      font-size: 12px;
+      border-top: 1px solid var(--rule);
+    }
+
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 16px, 680px); margin-top: 12px; }
+      .masthead, .meta, .stage, .foot { padding-left: 16px; padding-right: 16px; }
+      h1 { font-size: 24px; }
+      .stem { font-size: 17px; }
+      .stamp { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <article class="sheet">
+      <header class="masthead">
+        <div>
+          <p class="kicker">八年级上册 · 第一单元第 1 课</p>
+          <h1>认识智慧农业</h1>
+        </div>
+        <div class="stamp">随堂测试</div>
+      </header>
+
+      <div class="meta">
+        <span>单选题 · 共 5 题 · 每题 20 分</span>
+        <div class="track" id="track" aria-hidden="true"></div>
+      </div>
+
+      <section class="stage" id="stage" aria-live="polite"></section>
+      <p class="foot">教育科学出版社《信息科技》 · 先作答，再看解析。点开其他选项可对照正误。</p>
+    </article>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        title: "与传统农业相比，智慧农业的主要特点是什么？",
+        options: [
+          "完全依靠人工经验进行生产",
+          "综合运用物联网、自动控制等技术进行生产",
+          "只关注农产品的销售价格",
+          "不需要采集农业生产数据"
+        ],
+        answer: 1,
+        explanations: [
+          "依靠经验施肥和灌溉是传统农业的常见方式，容易造成人力、物力和资源浪费。",
+          "智慧农业集成物联网、无线通信、网络、自动控制和辅助决策等技术，使生产更加自动化、智能化。",
+          "智慧农业关注生产全过程，不只是销售价格，还包括资源利用、成本、产量和质量。",
+          "采集温度、湿度、光照等数据，是智慧农业进行分析和控制的重要基础。"
+        ]
+      },
+      {
+        title: "下列哪一项最符合物联网的含义？",
+        options: [
+          "只有人与人通过网络进行交流",
+          "物品只能接收信息，不能发送信息",
+          "物与物、物与人通过互联网相互连接",
+          "所有设备都必须由人工现场操作"
+        ],
+        answer: 2,
+        explanations: [
+          "人与人通过网络交流主要体现传统互联网的应用方式，物联网的连接对象更广泛。",
+          "物联网设备既可以采集并上传信息，也可以接收云端指令并执行操作。",
+          "物联网让物与物、物与人通过互联网相互连接，其概念和目的可以概括为“万物互联”。",
+          "物联网设备可以接受远程控制，也可以根据设定的逻辑自动运行。"
+        ]
+      },
+      {
+        title: "下列哪一组最能体现农业物联网的特征？",
+        options: [
+          "实时监测、远程控制、查询和警告",
+          "人工记录、现场操作、经验判断和手工灌溉",
+          "网上聊天、收发邮件、播放视频和下载文件",
+          "只监测温度，不查询信息，也不能控制设备"
+        ],
+        answer: 0,
+        explanations: [
+          "教材列出的农业物联网应用功能包括：实时监测功能、远程控制功能、查询功能和警告功能。",
+          "依靠经验、现场操作和人工记录属于传统农业常见的生产方式，不是教材列出的农业物联网应用功能。",
+          "网上聊天、收发邮件、播放视频和下载文件是常见的互联网应用，不是教材列出的农业物联网应用功能。",
+          "教材中的农业物联网不仅能实时监测，还能远程控制设备、查询信息，并在数据超出限值时发出警告。"
+        ]
+      },
+      {
+        title: "用户通过手机关闭智慧温室中的排风机，体现了农业物联网的哪项功能？",
+        options: ["实时监测", "远程控制", "信息查询", "警告提醒"],
+        answer: 1,
+        explanations: [
+          "实时监测是利用传感器持续采集温度、湿度等数据，而不是控制设备开关。",
+          "用户利用手机或电脑在远处控制排风机、卷帘机或水阀，体现的是远程控制。",
+          "信息查询是查看环境参数、历史曲线、操作记录或市场行情等信息。",
+          "警告提醒是在数据超过预设限值时，系统向农户发送提示信息。"
+        ]
+      },
+      {
+        title: "物联网与互联网的主要区别是什么？",
+        options: [
+          "互联网不能传输信息",
+          "物联网只能应用于农业",
+          "互联网主要连接人与人，物联网还可以连接人与物、物与物",
+          "物联网和互联网没有任何联系"
+        ],
+        answer: 2,
+        explanations: [
+          "互联网当然能够传输信息，这是互联网最基本的功能之一。",
+          "物联网不仅用于农业，也广泛应用于智能家居、交通、医疗和工业等领域。",
+          "互联网中的信息通常由人上传和接收；物联网还能让设备自动采集信息，实现人与物、物与物之间的连接。",
+          "物联网是在互联网基础上延伸和扩展的网络，两者关系密切。"
+        ]
+      }
+    ];
+
+    const answers = Array(questions.length).fill(null);
+    let index = 0;
+    const stage = document.getElementById("stage");
+    const track = document.getElementById("track");
+    const letters = ["A", "B", "C", "D"];
+
+    function renderTrack() {
+      track.innerHTML = questions.map((_, i) => {
+        const state = answers[i] !== null ? "done" : i === index ? "now" : "";
+        return `<span class="dot ${state}"></span>`;
+      }).join("");
+    }
+
+    function renderQuestion() {
+      const q = questions[index];
+      const picked = answers[index];
+      const revealed = picked !== null;
+      const correct = revealed && picked === q.answer;
+
+      stage.innerHTML = `
+        <p class="q-label">第 ${index + 1} 题 / 共 ${questions.length} 题</p>
+        <h2 class="stem">${q.title}</h2>
+        <div class="choices ${revealed ? "revealed" : ""}">
+          ${q.options.map((text, i) => {
+            let cls = "choice";
+            let tag = "";
+            if (revealed) {
+              if (correct) {
+                if (i === q.answer) {
+                  cls += " is-right open";
+                  tag = `<span class="tag ok">正确</span>`;
+                }
+              } else {
+                if (i === q.answer) cls += " is-key open";
+                else cls += i === picked ? " is-wrong open" : " is-miss";
+                tag = i === q.answer
+                  ? `<span class="tag ok">正确</span>`
+                  : `<span class="tag bad">错误</span>`;
+              }
+            }
+            return `
+              <button class="${cls}" type="button" data-option="${i}">
+                <span class="mark">${letters[i]}</span>
+                <span>${text}</span>
+                ${tag}
+                <span class="hint-tap">点击查看该选项解析</span>
+                <span class="why"><b>解析</b>${q.explanations[i]}</span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+        <div class="banner ${revealed ? "show" : ""} ${revealed && !correct ? "bad" : "ok"}" id="banner">
+          ${revealed ? bannerHTML(q, picked, correct) : ""}
+        </div>
+        <div class="nav">
+          <button class="btn ghost" type="button" id="prevBtn" ${index === 0 ? "disabled" : ""}>上一题</button>
+          <button class="btn" type="button" id="nextBtn" ${revealed ? "" : "disabled"}>
+            ${index === questions.length - 1 ? "查看成绩" : "下一题"}
+          </button>
+        </div>
+      `;
+
+      stage.querySelectorAll(".choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const oi = Number(btn.dataset.option);
+          if (answers[index] === null) {
+            answers[index] = oi;
+            renderTrack();
+            renderQuestion();
+            return;
+          }
+          btn.classList.toggle("open");
+        });
+      });
+
+      document.getElementById("prevBtn").addEventListener("click", () => {
+        if (index > 0) { index -= 1; renderTrack(); renderQuestion(); }
+      });
+      document.getElementById("nextBtn").addEventListener("click", () => {
+        if (answers[index] === null) return;
+        if (index < questions.length - 1) {
+          index += 1;
+          renderTrack();
+          renderQuestion();
+        } else {
+          renderScore();
+        }
+      });
+    }
+
+    function bannerHTML(q, picked, correct) {
+      if (correct) {
+        return `<strong>回答正确</strong><p><b>解析</b>　${q.explanations[picked]}</p>`;
+      }
+      return `<strong>回答错误，正确答案是 ${letters[q.answer]}</strong>
+        <p><b>解析</b>　你选了 ${letters[picked]}：${q.explanations[picked]}</p>
+        <p style="margin-top:8px">正确项 ${letters[q.answer]}：${q.explanations[q.answer]}</p>`;
+    }
+
+    function renderScore() {
+      const correct = answers.reduce((n, a, i) => n + (a === questions[i].answer ? 1 : 0), 0);
+      const score = correct * 20;
+      const note = score === 100 ? "全部答对，这一课的概念已经比较清楚。" :
+                   score >= 80 ? "掌握得比较稳，把错题选项再对照一遍即可。" :
+                   score >= 60 ? "基本过关。建议再看物联网的含义，以及监测、控制等功能的区别。" :
+                   "先回到课文里的智慧农业和物联网部分，看完解析后再测一次。";
+
+      stage.innerHTML = `
+        <div class="scorecard show">
+          <h2>本次成绩</h2>
+          <div class="big">${score}</div>
+          <p>答对 ${correct} 题，答错 ${questions.length - correct} 题</p>
+          <p>${note}</p>
+          <div class="review">
+            ${questions.map((q, i) => {
+              const ok = answers[i] === q.answer;
+              return `<button type="button" data-jump="${i}">
+                <span>第 ${i + 1} 题　${ok ? "正确" : "错误"}</span>
+                <span>你的答案 ${letters[answers[i]]}　标准答案 ${letters[q.answer]}</span>
+              </button>`;
+            }).join("")}
+          </div>
+          <div class="nav" style="justify-content:center;margin-top:24px">
+            <button class="btn" type="button" id="retryBtn">重新作答</button>
+          </div>
+        </div>
+      `;
+
+      stage.querySelectorAll("[data-jump]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          index = Number(btn.dataset.jump);
+          renderTrack();
+          renderQuestion();
+        });
+      });
+      document.getElementById("retryBtn").addEventListener("click", () => {
+        answers.fill(null);
+        index = 0;
+        renderTrack();
+        renderQuestion();
+      });
+    }
+
+    renderTrack();
+    renderQuestion();
+  </script>
+</body>
+</html>

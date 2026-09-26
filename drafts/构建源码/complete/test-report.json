@@ -1,0 +1,29 @@
+{
+  "passed": 23,
+  "tests": [
+    "10 stations and 3 embedded image assets",
+    "All routes and forward navigation work",
+    "Initial prediction and notes use local-only persistence",
+    "Wrong recall gives feedback, correct recall completes once",
+    "All device hotspots update details and complete once",
+    "Order rejects incorrect sequence and accepts correct sequence",
+    "Historical values contain exact first crossing",
+    "MQTT without subscription does not deliver",
+    "MQTT exact subscription routes valid message",
+    "Different topic does not overwrite last received message",
+    "Single-level wildcard matches both greenhouse ids",
+    "Topic case sensitivity enforced",
+    "Invalid JSON safely rejected",
+    "Invalid application schema safely rejected",
+    "Offline broker fails delivery and clears subscription",
+    "Automatic simulation opens and closes after threshold crossing",
+    "Invalid thresholds block advancing time",
+    "Stuck valve distinguishes sent command from execution",
+    "Network failure preserves last value and labels stale state",
+    "Manual control requires manual mode",
+    "First attempt quiz score persists through correction",
+    "Map validation requires four branches and explanation",
+    "Notebook export content includes learner evidence"
+  ],
+  "scope": "Isolated DOM unit tests. Browser visual and interaction validation blocked by local-file URL policy."
+}

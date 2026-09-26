@@ -1,0 +1,34 @@
+// Isolated DOM unit tests: no browser, network, real device or user storage.
+import fs from 'node:fs/promises';import vm from 'node:vm';import assert from 'node:assert/strict';
+import {parseHTML} from './test-runtime/node_modules/linkedom/esm/index.js';
+const html=await fs.readFile('out/智慧农业_完整版/互动课堂.html','utf8');
+const {document}=parseHTML(html);for(const e of document.querySelectorAll('select'))Object.defineProperty(e,'value',{value:e.querySelector('option').value,writable:true});
+const memory=new Map();let timers=0;
+const ctx=vm.createContext({document,window:{scrollTo(){},print(){}},localStorage:{getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)},console,Blob,URL,setTimeout:()=>++timers,clearTimeout(){},setInterval:()=>++timers,clearInterval(){}});
+const src=await fs.readFile('build/complete/app.js','utf8');vm.runInContext(src,ctx);
+const $=id=>document.getElementById(id),run=s=>vm.runInContext(s,ctx),click=id=>$(id).onclick();let tests=[];
+function test(name,f){f();tests.push(name)}
+test('10 stations and 3 embedded image assets',()=>{assert.equal(document.querySelectorAll('.station').length,10);assert.equal(document.querySelectorAll('img[src^="data:image/jpeg"]').length,3);assert(!html.includes('{{park}}'))});
+test('All routes and forward navigation work',()=>{for(let n=0;n<10;n++){run(`go(${n})`);assert($('station'+n).classList.contains('active'));assert.equal(document.querySelectorAll('.station.active').length,1)}});
+test('Initial prediction and notes use local-only persistence',()=>{$('prediction').value='观察土壤示数并判断';$('prediction').oninput();assert(run('state.notes.prediction').includes('土壤'));assert(memory.size>0)});
+test('Wrong recall gives feedback, correct recall completes once',()=>{click('recallYes');assert($('recallFeedback').classList.contains('bad'));click('recallNo');click('recallNo');assert.equal(run("state.done.filter(x=>x==='recall').length"),1)});
+test('All device hotspots update details and complete once',()=>{for(let n=0;n<5;n++)run(`device(${n})`);assert.equal(run('state.seen.length'),5);assert($('deviceDetail').textContent.includes('排风机'))});
+test('Order rejects incorrect sequence and accepts correct sequence',()=>{click('checkOrder');assert($('orderFeedback').classList.contains('bad'));run('order=[0,1,2,3,4];renderOrder()');click('checkOrder');assert($('orderFeedback').textContent.includes('顺序正确'))});
+test('Historical values contain exact first crossing',()=>{assert.equal(run('history.find(x=>x.v<35).t'),'09:20');assert.equal(document.querySelectorAll('#historyRows tr').length,6)});
+test('MQTT without subscription does not deliver',()=>{$('brokerOnline').checked=true;click('publish');assert.equal($('inbox').textContent,'尚未收到消息');assert($('mqttFeedback').textContent.includes('尚未订阅'))});
+test('MQTT exact subscription routes valid message',()=>{click('subscribe');click('publish');assert($('inbox').textContent.includes('farm/1/soil'));assert($('mqttFeedback').textContent.includes('投递成功'))});
+test('Different topic does not overwrite last received message',()=>{const before=$('inbox').textContent;$('pubTopic').value='farm/2/soil';click('publish');assert.equal($('inbox').textContent,before);assert($('mqttFeedback').textContent.includes('不匹配'))});
+test('Single-level wildcard matches both greenhouse ids',()=>{$('subTopic').value='farm/+/soil';click('subscribe');click('publish');assert($('inbox').textContent.includes('farm/2/soil'))});
+test('Topic case sensitivity enforced',()=>{assert.equal(run("matches('farm/1/soil','Farm/1/soil')"),false)});
+test('Invalid JSON safely rejected',()=>{$('payload').value='{invalid';click('publish');assert($('mqttFeedback').textContent.includes('有效 JSON'))});
+test('Invalid application schema safely rejected',()=>{$('payload').value='{"value":"28","unit":"%"}';click('publish');assert($('mqttFeedback').textContent.includes('0–100'))});
+test('Offline broker fails delivery and clears subscription',()=>{$('payload').value='{"value":28,"unit":"%"}';$('brokerOnline').checked=false;$('brokerOnline').onchange();click('publish');assert($('mqttFeedback').textContent.includes('未送到'));assert.equal(run('subscription'),null)});
+test('Automatic simulation opens and closes after threshold crossing',()=>{click('simReset');for(let n=0;n<5;n++)click('simStep');assert.equal(run('sim.opened'),true);assert.equal(run('sim.closed'),true);assert.equal(run('sim.on'),false);assert($('simTask').textContent.includes('自动关阀'))});
+test('Invalid thresholds block advancing time',()=>{let time=run('sim.time');$('low').value='60';$('high').value='30';click('simStep');assert.equal(run('sim.time'),time);assert($('simFeedback').textContent.includes('合法阈值'));$('low').value='35';$('high').value='55'});
+test('Stuck valve distinguishes sent command from execution',()=>{click('simReset');$('fault').value='valve';click('simStep');assert.equal(run('sim.on'),false);assert($('simFeedback').textContent.includes('仍关闭'))});
+test('Network failure preserves last value and labels stale state',()=>{click('simReset');$('fault').value='network';click('simStep');assert.equal(run('sim.last'),28);assert($('lastReading').textContent.includes('可能已过期'))});
+test('Manual control requires manual mode',()=>{click('simReset');click('manualOpen');assert.equal(run('sim.on'),false);$('controlMode').value='manual';$('controlMode').onchange();click('manualOpen');assert.equal(run('sim.on'),true);click('manualClose');assert.equal(run('sim.on'),false)});
+test('First attempt quiz score persists through correction',()=>{run('qi=0;renderQuiz()');document.querySelector('[data-quiz="0"]').onclick();document.querySelector('[data-quiz="1"]').onclick();assert.equal(run('state.first[0]'),0);assert.equal(run('state.quiz[0]'),1);assert($('quizResult').textContent.includes('首次作答 0/8'))});
+test('Map validation requires four branches and explanation',()=>{click('checkMap');assert($('mapFeedback').classList.contains('bad'));for(const id of ['map0','map1','map2','map3','explanation']){$(id).value='这是完整的系统关系说明';$(id).oninput()}click('checkMap');assert($('mapFeedback').textContent.includes('字段结构完整'))});
+test('Notebook export content includes learner evidence',()=>{const n=run('notes()');assert(n.includes('观察土壤'));assert(n.includes('首次作答'));assert(n.includes('教学模拟'))});
+await fs.writeFile('build/complete/test-report.json',JSON.stringify({passed:tests.length,tests,scope:'Isolated DOM unit tests. Browser visual and interaction validation blocked by local-file URL policy.'},null,2));console.log(tests.length+' isolated DOM tests passed');
