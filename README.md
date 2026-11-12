@@ -1,25 +1,20 @@
-# 信息科技八年级上册 · 课堂资源库
+# 青竹湖湘一课堂资源
 
-[打开课程网站](https://zengweihaooo.github.io/information-technology-lessons/) · [第一单元第 4 课：智慧农场教学网页](https://zengweihaooo.github.io/information-technology-lessons/lesson.html?id=1-4)
+[打开课程网站](https://zengweihaooo.github.io/information-technology-lessons/)
 
-本仓库按教材单元和课时整理课堂网页、可编辑课件、网页演示版及制作过程。
+## 两条课程线
 
-## 目录
+- [PS 选修课](https://zengweihaooo.github.io/information-technology-lessons/ps.html)：第1–4课正式资料，以及暂编第5课的校园海报方案。
+- [信息技术课](https://zengweihaooo.github.io/information-technology-lessons/information.html)：八年级上册，按单元和课时查找。
 
-- `docs/`：GitHub Pages 网站及供网页直接访问的最终资源。导航为 `八年级上册 → 单元 → 课时`。
-- `final/`：按 `八年级上册/第一单元/第N课/` 保存的最终稿。第 1 课大体积 PPT 为避免重复存储，仅在 `docs/lessons/unit-1/lesson-1/` 保存一份。
-- `drafts/`：各版 PPT、网页、视频草稿和构建源码。
-- `课程目录.md`：四个单元的课程纲目。
+## 文件位置
 
-PPT 的网页演示由 PDF 页面渲染为图片，支持上/下页、方向键和全屏。可编辑 PPT 原件保留在仓库。体积超过 GitHub 单文件常规限制的资料使用 Git LFS，下载前请安装 Git LFS 并执行 `git lfs pull`。
+`docs/ps/` 保存 PS 课件、操作手册、学生素材、教师样张和录屏；`docs/lessons/` 保存信息技术课资料。每课只保留当前版本，页面预览与课件对应。
 
-## 新增课时
+较大的文件放在 [课程资料下载](https://github.com/Zengweihaooo/information-technology-lessons/releases/tag/course-materials-2026-11-12) 中，网站已有直接下载链接。无需安装 Git LFS。Git 既有提交记录不改写，历史文件不再出现在当前目录。
 
-1. 在 `final/八年级上册/第X单元/第Y课/` 放入最终稿，过程版本放入对应的 `drafts/` 目录。
-2. 需要网页访问的文件放到 `docs/lessons/unit-X/lesson-Y/`。
-3. 在 `docs/assets/site.js` 的 `units`、`available`、`res` 中登记课时与资源。
-4. PPT 可转为 PDF，再逐页渲染到 `docs/assets/slides/lesson-Y/slide-01.jpg` 等，并设置总页数。
+第4课套索工具更新于2026年11月12日。第5课为暂定海报方案，原文件内部仍标第4课。信息技术第3课使用11页版本；其中预留了课堂视频位置，不表示已嵌入视频。课堂网页中的外部表单和数据看板由对应服务提供。
 
-## 原始资料说明
+## 本地资料
 
-教材 PDF 是第三方出版物，未放入公开仓库。课代表表格涉及学生资料收集，也未上传。自动生成的缓存、依赖目录和重复渲染中间文件未归档；保留了可编辑稿、主要过程稿和构建源码。
+教材 PDF、学生资料收集表和清理记录只保留本地，不进入公开仓库。课堂作品、教材和引用图片的权利归各自权利人所有，本仓库不授予第三方素材的再授权。
